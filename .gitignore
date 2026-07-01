@@ -1,0 +1,12 @@
+# Project place file
+/Acend.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+sourcemap.json
+
+# Wally-generated package directories (reinstall via `wally install`)
+/Packages
+/ServerPackages
