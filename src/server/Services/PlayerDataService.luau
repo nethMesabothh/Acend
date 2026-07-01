@@ -11,14 +11,26 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Signal = require(ReplicatedStorage.Packages.Signal)
 
 local GameConfig = require(ReplicatedStorage.Shared.Config.GameConfig)
-local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Types = require(ReplicatedStorage.Shared.Types)
 
-type ProfileData = {
-	Coins: number,
-}
+type ProfileData = Types.ProfileData
 
 local TEMPLATE: ProfileData = {
 	Coins = GameConfig.StartingCoins,
+
+	Realm = GameConfig.StartingRealm,
+	Qi = 0,
+	Path = nil,
+	Talents = {},
+
+	EquippedTechnique = nil,
+	TechniqueMastery = {},
+
+	WeaponStage = GameConfig.StartingWeaponStage,
+	CombatWins = 0,
+
+	BreakthroughCooldownUntil = nil,
+	HasCompletedTutorial = false,
 }
 
 local playerStore = ProfileStore.New("PlayerData", TEMPLATE)
@@ -51,7 +63,6 @@ local function onPlayerAdded(player: Player)
 	if player.Parent == Players then
 		profiles[player] = profile
 		PlayerDataService.ProfileLoaded:Fire(player, profile)
-		Remotes.CoinsUpdated:FireClient(player, profile.Data.Coins)
 	else
 		profile:EndSession()
 	end

@@ -35,7 +35,15 @@ local folder = getOrCreateFolder()
 
 -- Declare every remote your game uses here.
 local Remotes = {
-	CoinsUpdated = getOrCreateRemoteEvent(folder, "CoinsUpdated"),
+	-- cultivation loop (Phase 1)
+	CultivationUpdated = getOrCreateRemoteEvent(folder, "CultivationUpdated"),
+	RequestMeditate = getOrCreateRemoteEvent(folder, "RequestMeditate"),
+	RequestBreakthrough = getOrCreateRemoteEvent(folder, "RequestBreakthrough"),
+	BreakthroughResult = getOrCreateRemoteEvent(folder, "BreakthroughResult"),
+	SelectPath = getOrCreateRemoteEvent(folder, "SelectPath"),
+	UseTechnique = getOrCreateRemoteEvent(folder, "UseTechnique"),
+	TalentRolled = getOrCreateRemoteEvent(folder, "TalentRolled"),
+	WeaponEvolved = getOrCreateRemoteEvent(folder, "WeaponEvolved"),
 }
 
 return Remotes
