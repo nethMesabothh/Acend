@@ -1,647 +1,308 @@
 # Acend — Game Design Document
 
-**Genre:** Ascension RPG (cultivation / xianxia-inspired)  
-**Platform:** Roblox  
-**Working title:** Acend  
+**Genre:** Cultivation Stage-Clearer
+**Platform:** Roblox
+**Working title:** Acend
 **Status:** Pre-production / design phase
 
 ---
 
 ## Vision
 
-Acend is not a strength simulator. It is an **Ascension RPG** where players forge a personal legend through cultivation, choice, and mastery.
+Acend is a **cultivation stage-clearer**: train, grow stronger, and push through an escalating ladder of stages. The loop stays tight and legible — no menus to get lost in, no systems that don't pay off in your hands within a session.
 
 The core fantasy:
 
-> *You are not just becoming stronger — you are ascending through realms, shaping your identity, and leaving a mark on a living world.*
-
-Two players who have played for 100 hours should feel **distinct** from each other. Progression should unlock **new ways to play**, not only higher numbers.
+> *You are a cultivator forging both body and spirit — strong enough in each to face any foe, weak in neither.*
 
 ### Design Pillars
 
 | Pillar | Meaning |
 |--------|---------|
-| **Identity over stats** | Build diversity matters more than a single DPS leaderboard |
-| **Events over increments** | Breakthroughs, ascensions, and world shifts should feel memorable |
-| **Practice over menus** | Mastery through use; choices through playstyle |
-| **World over lobby** | The server should feel alive, reactive, and shared |
-| **Risk over safety** | Failure, faction consequences, and boss adaptation create stories |
+| **Two powers, one cultivator** | Body (Strength) and Spirit (Qi) are separate stats you grow separately — not one number that goes up |
+| **Right tool, right foe** | Beasts fall only to Physical damage. Demons fall only to Magic damage. No single build clears everything |
+| **Stage by stage** | Clear a stage, get stronger, push to the next. Progress is always visible and always earned |
+| **Growth you can feel** | Breakthroughs, mastery, and weapon evolution are events worth remembering, not stat ticks |
 
-### What We Are Not Building
+### What We Are Not Building (For Now)
 
-- A linear “click train → number go up” simulator
-- A game where every player converges on one optimal build
-- A static world where bosses exist only as damage sponges
+- A sprawling living-world MMO with factions, migrating world bosses, and server memory (see [Future Ideas](#future-ideas-backlog) — not cut, just not now)
+- A game where one damage type trivializes every fight
+- A linear "click train → number go up" simulator with no build decisions
 
 ---
 
 ## Core Progression Loop
 
 ```
-Train & meditate
-      ↓
-Learn techniques
-      ↓
-Choose a cultivation path
-      ↓
-Breakthrough (realm advancement)
-      ↓
-Explore new regions
-      ↓
-Find rare treasures & materials
-      ↓
-Upgrade / evolve your weapon
-      ↓
-Fight dynamic bosses
-      ↓
-Unlock new abilities & fusions
-      ↓
-Change the world (server evolution)
-      ↓
-Ascend to a higher existence
-      ↓
-(Reincarnate / mentor / new saga)
+Cultivate (Spirit / Qi)  +  Train (Body / Strength)
+                  ↓
+       Breakthrough (realm advances)
+                  ↓
+      New techniques, higher damage caps
+                  ↓
+     Clear the next Stage (Beasts / Demons / Boss)
+                  ↓
+   Materials, Coins, weapon evolution progress
+                  ↓
+              Repeat, harder
 ```
 
-Every step in this loop should answer: **“What can I do now that I couldn’t before?”**
+Every step should answer: **"What can I fight now that I couldn't before?"**
 
 ---
 
-## 1. Cultivation Realm System (Not Levels)
+## 1. Two Paths to Power
 
-Replace generic levels with **realms** — stages of spiritual ascension. Each breakthrough is a **ceremony**, not a stat tick.
+Every cultivator grows through **two separate stats**, not one:
 
-### Example Realm Ladder
+| Stat | Gained by | Governs |
+|------|-----------|---------|
+| **Qi (Spirit Power)** | Cultivation — meditation in safe zones | Magic damage, max Qi |
+| **Strength (Body Power)** | Training — active combat drills / sparring | Physical damage, max Stamina/HP |
+
+Neither stat is optional. A player who only meditates can out-damage any Demon but will bounce off every Beast. A player who only trains is the reverse. **Breakthrough to the next realm requires meeting a threshold in both** — you cannot out-grind one stat to skip the other.
+
+This replaces the old "pick one skill tree" model: the two stats aren't a build choice you make once, they're both always growing, and the *ratio* between them is your identity (a Body-heavy cultivator, a Spirit-heavy one, or a balanced one).
+
+### Cultivation Realm Ladder (Kept from original design)
 
 | Realm | Fantasy |
 |-------|---------|
 | Mortal | Ordinary beginning; no techniques |
-| Body Tempering | Physical foundation; unlocks body path |
-| Spirit Gathering | Qi manipulation; elemental affinity awakens |
-| Core Formation | Stable inner core; fusion & summons unlock |
-| Nascent Soul | Soul projection; advanced bosses & PvP tiers |
-| Immortal | Server-wide events; world evolution access |
-| Celestial | Endgame ascension branches |
+| Body Tempering | Physical foundation; Strength techniques unlock |
+| Spirit Gathering | Qi manipulation; Magic techniques unlock |
+| Core Formation | Stable inner core; higher stage tiers unlock |
+| Nascent Soul | Soul projection; advanced stages |
 
-### Breakthrough Events
-
-Breakthroughs should never be “press button, +1 realm.” Examples:
-
-- **Meditation trial** — timed focus minigame or calm-zone challenge
-- **Inner demon** — personal boss fight using your own build against you
-- **Heavenly lightning** — survive waves of environmental damage
-- **Treasure consumption** — spend rare pills, herbs, or spirit stones
-
-### Failure & Consequence
-
-Failed breakthroughs create story, not frustration:
-
-- Temporary **realm instability** (reduced stats or technique cooldown penalty)
-- **Qi deviation** debuff requiring recovery quest or meditation
-- Lost materials (partial cost), not full character wipe
-- Cooldown before next attempt
-
-**Design goal:** Players remember their first Nascent Soul breakthrough. They do not remember reaching “Level 47.”
+Breakthroughs remain **events, not stat ticks**: a trial (survive a timer, or later, an inner-demon fight), with a soft failure penalty (partial Qi/Strength loss + cooldown), never a full reset.
 
 ---
 
-## 2. Playstyle Skill Trees (Not Stat Trees)
+## 2. Combat: Physical vs. Magic
 
-Skill trees must **change how you play**, not just add `+10% damage`.
+Two damage types. Every technique deals one or the other.
 
-### Cultivation Paths
+| Damage Type | Source Stat | Effective Against | No Effect Against |
+|-------------|-------------|--------------------|--------------------|
+| **Physical** | Strength | Beasts | Demons |
+| **Magic** | Qi | Demons | Beasts |
 
-#### Path of the Sword
-- Fast combos, counterattacks, dash cancels, critical finishers
-- High mobility, lower base HP
+This is a **hard gate, not a percentage bonus** — a Beast takes 0 damage from Magic, a Demon takes 0 damage from Physical. That's the point: it forces real investment in both stats (or real teamwork with someone who covers your gap), rather than a soft "+20% vs X" that a strong enough single build can ignore.
 
-#### Path of the Body
-- High HP, regeneration, heavy strikes, taunt / tank tools
-- Slower but survives world bosses and lightning tribulations
+**Enemy Types**
 
-#### Path of the Elements
-- Fire, Ice, Lightning, Wind — each with different control and area denial
-- Elemental interactions (fire spreads on wind, ice shatters on heavy hits)
-
-#### Path of Summoning
-- Spirit beasts, clones, golems
-- Positioning and command gameplay instead of direct melee
-
-### Tree Rules
-
-- Players can **lean** into one path but may dabble in others at higher cost
-- Respec is possible but expensive and lore-justified (e.g., “severing your dao”)
-- Key nodes unlock **mechanics**, not just multipliers:
-  - Parry window
-  - Double jump
-  - Spirit link (share damage with summon)
-  - Element infusions on basic attacks
+| Type | Weak to | Immune to | Fantasy |
+|------|---------|-----------|---------|
+| Beast | Physical | Magic | Feral creatures, wildlife corrupted by Qi |
+| Demon | Magic | Physical | Spirits, corrupted Qi given form |
+| *(Later)* Mixed / Boss | Both required | — | Multi-phase fights, gates real dual investment |
 
 ---
 
-## 3. Dynamic Bosses
+## 3. Stage System
 
-Bosses are **world events**, not static farming targets.
+Replaces an open living world (for now) with a **sequential ladder of stages** — legible, testable, and finishable in a session.
 
-### Example: The Crimson Dragon Awakens
+- Stages are numbered (Stage 1, 2, 3, …), each a self-contained arena.
+- Each stage has a fixed enemy composition: a **Beast stage**, a **Demon stage**, or a **Mixed stage**.
+- Clearing all waves in a stage spawns a **stage boss**; defeating it clears the stage and unlocks the next.
+- Difficulty (enemy count, HP, damage) scales with stage number.
+- Rewards per clear: Coins, breakthrough materials, weapon evolution progress.
 
-- Server announcement: *“The Crimson Dragon has awakened.”*
-- Players converge on a live location
-- Boss behavior:
-  - Destroys structures / terrain (temporary or phased)
-  - Changes weather and lighting
-  - Summons minions at HP thresholds
-  - **Flies to another region** if ignored too long
-  - Enrages if fought with only one strategy (see Boss Learning)
-
-### Boss Tiers
-
-| Tier | Scope | Example |
-|------|-------|---------|
-| Zone boss | 1–5 players | Corrupted spirit in a dungeon |
-| Regional boss | 10–30 players | Bandit king assaulting a village |
-| World boss | Full server | Crimson Dragon, Heavenly Beast |
-| Tribulation entity | Personal / party | Inner demon, lightning spirit |
-
-### Rewards
-
-- Rare breakthrough materials
-- Weapon evolution progress
-- World-state triggers (see World Evolution)
-- **Legend entries** (see Additional Ideas)
+This keeps "explore a living world" as a **future idea**, not a Phase 1 dependency — stages give the same sense of escalating challenge without needing server-wide state, migration logic, or world events to already exist.
 
 ---
 
 ## 4. Weapon Growth (Evolution, Not Replacement)
 
-Players bond with **one primary weapon** that grows with them.
-
-### Evolution Chain Example
+Unchanged in spirit from the original design — players bond with **one primary weapon** that evolves with them.
 
 ```
 Rusty Sword
-    → Spirit Sword        (100+ battles, basic mastery)
-    → Dragon Slayer       (boss essence, fire path synergy)
-    → Heavenly Blade      (ascension material, realm gate)
-    → [Branch] Storm Sovereign / Void Reaver / etc.
+    → Spirit Sword     (realm advance + stage clears)
+    → Dragon Slayer     (boss essence, later phases)
+    → Heavenly Blade     (ascension material, later phases)
 ```
 
-### Evolution Inputs
-
-- Battle count (mastery)
-- Boss essences dropped from specific encounters
-- Cultivation path alignment
-- Player choices during ascension
-
-### Why This Matters
-
-- Emotional attachment to gear
-- Visual prestige (glow, aura, trail effects)
-- Fewer inventory headaches than constant weapon swapping
-- Secondary weapons / tools can exist for variety without replacing identity
+Evolution inputs: stage-boss kills, realm advancement, cultivation path alignment. Visual prestige (glow, trail) on each evolution — no inventory swapping needed.
 
 ---
 
 ## 5. Random Cultivation Talents
 
-Each new character rolls **innate talents** at creation (or first login). No two cultivators are identical.
-
-### Example Talent Pool
+Kept from the original design, reframed slightly to touch the new Body/Spirit split:
 
 | Talent | Effect |
 |--------|--------|
-| Fire Affinity | +20% fire damage |
-| Weak Water Resistance | -15% water defense |
-| Fast Meditation | +25% offline / passive training speed |
-| Unstable Core | +10% breakthrough reward, +15% failure risk |
-| Beast Whisperer | Summon path starts stronger |
-| Sword Prodigy | Sword techniques level 2x faster |
-
-### Talent Design Rules
-
-- Every talent should have a **tradeoff** or niche — avoid pure “S-tier” rolls
-- Reroll options exist but are rare (premium item, endgame quest, or reincarnation)
-- Talents influence **AI recommendations** for path choice, not hard locks
-- Display talents on player inspect / legend card for social identity
-
----
-
-## 6. Living World
-
-The world should generate **unexpected opportunities**, not just static NPCs.
-
-### World Events (Rotating)
-
-- Villages attacked by demon beasts
-- Merchant caravans traveling between hubs (escort / raid choices)
-- Meteorites crashing — temporary mining zones with rare ore
-- Ancient ruins appearing for limited time
-- Bosses migrating between regions
-
-### Event Cadence (Suggested)
-
-- **Micro events:** every 5–15 minutes (caravan, small invasion)
-- **Major events:** every 30–60 minutes (ruins, regional boss)
-- **Server saga events:** weekly or triggered by community milestones
-
-### Player Agency
-
-- Ignoring events has consequences (village destroyed → prices rise, quests change)
-- Participating unlocks faction reputation and unique materials
-
----
-
-## 7. Reputation & Factions
-
-Actions define how the world treats you.
-
-### Example Factions
-
-- Holy Sect
-- Demon Cult
-- Mercenary Guild
-- Wanderer’s Alliance
-- Imperial Court
-
-### Reputation States
-
-| Standing | Effect |
-|----------|--------|
-| Hero | Discounts, exclusive righteous techniques |
-| Villain | Black market access, feared by guards |
-| Demon Cult Leader | Summon & corruption bonuses, hunted in holy zones |
-| Exile | Neutral zones only until redeemed |
-
-### Mechanics
-
-- Quest choices shift reputation
-- Some NPCs refuse service at extreme standings
-- Faction wars can be **server-wide** with territory control
-- Reputation visible on nameplate / legend card
-
----
-
-## 8. Boss Learning (Adaptive AI)
-
-Bosses **adapt to dominant player strategies** over a fight or across repeated encounters.
-
-### Examples
-
-| Player behavior | Boss adaptation |
-|-----------------|-----------------|
-| Everyone uses swords | Gains blade deflection / sword resistance |
-| Everyone uses fire | Starts absorbing fire, heals from burns |
-| Everyone kites | Gains gap closers and arena shrink |
-| Same party comps | Targets healers or summoners first |
-
-### Safeguards
-
-- Adaptation is **readable** (visual cue: boss “absorbs flame,” UI telegraph)
-- Caps on resistance so no strategy is fully invalidated
-- Encourages party composition variety and technique fusion
-- Resets on new spawn or weekly rotation so farming stays fresh
-
----
-
-## 9. Technique Fusion
-
-Reduce skill bloat. Let players **experiment** by combining techniques.
-
-### Fusion Examples
-
-| Input A | Input B | Output |
-|---------|---------|--------|
-| Fireball | Wind Slash | Flaming Tornado |
-| Lightning | Sword art | Thunder Blade |
-| Ice wall | Body slam | Avalanche Crash |
-| Summon wolf | Fire aura | Ember Pack |
-
-### Fusion Rules
-
-- Discoveries can be **recipe-based** (hidden combos) or **lab-based** (spend materials to experiment)
-- Failed fusions consume materials but may grant mastery XP
-- Fusion slots limited by realm — higher realms = more complex combos
-- Share fusion recipes through mentor system or guild codex
-
----
-
-## 10. Ascension Choices
-
-At major milestones, players choose **what they become** — not just “stronger.”
-
-### Ascension Branches
-
-| Path | Identity | Unlocks |
-|------|----------|---------|
-| God | Divine light, support & smite | Holy zones, blessing abilities |
-| Demon | Corruption, lifesteal, fear | Demon realms, sacrifice mechanics |
-| Dragon | Transformation, breath attacks | Flight segments, scale armor |
-| Machine | Precision, shields, overclock | Crafting bonuses, energy cores |
-
-### Branch Effects
-
-- Unique ability kits (not just recolors)
-- Different story quests and NPC reactions
-- Visual transformation (aura, form shift, idle animation)
-- Some branches gate certain fusions or weapon evolutions
-
-**Rule:** Ascension is **meaningful and hard to reverse**. Players should deliberate, discuss, and theorycraft.
-
----
-
-## 11. World Evolution (Server Memory)
-
-The server **remembers** what the community accomplishes.
-
-### Example Timeline
-
-| Phase | World State |
-|-------|-------------|
-| Week 1 | Peaceful Forest — tutorial hubs, low-tier beasts |
-| Week 3 | Corrupted Forest — demon influence after failed world boss |
-| Week 8 | Ancient Kingdom Ruins appear — new dungeon layer unlocked |
-
-### Triggers
-
-- World boss defeated / failed
-- Total realm breakthroughs across server
-- Faction war outcomes
-- Seasonal “tribulation” events
-
-### Persistence Model
-
-- **Soft persistence:** visual and spawn changes persist on server until reset
-- **Hard persistence:** milestone flags stored in DataStore / server profile (ProfileStore-friendly)
-- Seasonal resets with **legacy titles** for participants
-
----
-
-## 12. Mentor System
-
-High-realm players guide newcomers — retention for both cohorts.
-
-### Mentor Benefits
-
-| Role | Benefit |
-|------|---------|
-| Mentor | Exclusive cosmetics, mentor currency, legend prestige |
-| Disciple | XP bonus near mentor, technique scrolls, breakthrough hints |
-
-### Activities
-
-- Teach techniques (temporary loan or unlock quest)
-- Co-breakthrough support (inner demon party assist)
-- Shared world event bonuses when fighting together
-- Mentor hall / sect housing (social hub)
-
-### Safeguards
-
-- Anti-boosting: bonuses cap if power gap is too large
-- Mentor reputation — bad mentors can be reported / delisted
-
----
-
-## 13. Mastery Through Practice
-
-Techniques improve by **use**, not only by spending points.
-
-### Example: Punch Mastery
-
-| Uses | Evolution |
-|------|-----------|
-| 0 | Punch |
-| 5,000 | Heavy Punch |
-| 20,000 | Shockwave Punch |
-| 100,000 | Planet Breaker |
-
-### Mastery Rules
-
-- XP gain scales with **meaningful** use (hit confirms, not whiffing air AFK)
-- Diminishing returns on repetitive macro targets — variety bonus for mixed combat
-- Mastery visible on technique icon and legend card
-- Some evolutions require **both** mastery and a breakthrough material
-
----
-
-## Additional Ideas (Recommended)
-
-These complement the core plan and strengthen differentiation on Roblox.
-
-### 14. Legend Codex (Personal & Server History)
-
-Every player has a **Legend Codex** — a readable journal of milestones:
-
-- First breakthrough, ascension choice, weapon evolution
-- World bosses participated in
-- Faction betrayals and heroic deeds
-
-**Why:** Gives players a story to tell and share on social media. Turns stats into narrative.
-
-### 15. Spirit Root Quality (Growth Curve, Not Just Talents)
-
-At character creation, roll **spirit root quality** (e.g., Mortal Root → Heavenly Root).
-
-- Affects training speed and breakthrough difficulty
-- Does not hard-cap power — a Mortal Root legend is more impressive socially
-- Ties into reincarnation: “ascend with a flawed root” for permanent legacy bonus
-
-### 16. Qi Economy & Training Modes
-
-Different training methods consume different resources:
-
-| Mode | Resource | Best for |
-|------|----------|----------|
-| Meditation | Time, calm zones | Safe passive growth |
-| Combat training | Stamina, food | Active mastery |
-| Tribulation training | Risk, materials | Burst progression |
-| Sect chamber | Sect contribution | Social / guild play |
-
-Prevents one-button optimal strategy and supports both active and casual players.
-
-### 17. Alchemy & Crafting Loop
-
-Support breakthroughs with a crafting layer:
-
-- Herbs from biomes, ores from meteorites, essences from bosses
-- Pill quality affects breakthrough success rate
-- Bad pills cause Qi deviation — risk/reward crafting
-
-Connects **Living World** events to **Realm System** directly.
-
-### 18. Reincarnation (Long-Term Prestige)
-
-At endgame, players may **reincarnate**:
-
-- Reset realm to Mortal (or Body Tempering)
-- Keep: talents (partial), legend codex, cosmetic ascensions, some fusion knowledge
-- Gain: permanent “Dao fragment” bonuses, new talent slot, exclusive title
-
-Fits cultivation lore and extends retention beyond linear cap.
-
-### 19. Sects (Player-Run Organizations)
-
-Guild system with cultivation flavor:
-
-- Shared sect hall, contribution shop, sect techniques
-- Sect vs sect territory during world events
-- Sect tribulation — entire guild must cooperate for a breakthrough ritual
-
-### 20. Duel Philosophy (Structured PvP)
-
-Optional PvP with cultivation rules:
-
-- **Realm suppression** in low-level zones (higher realm stats capped)
-- Technique bans in ranked duels
-- Spectator mode with betting (cosmetic currency only to avoid gambling issues)
-
-### 21. Anti-Grind & Fair Play
-
-Mastery and training systems need guardrails:
-
-- Diminishing returns on same-target farming
-- Daily variety bonus for trying new zones / bosses
-- Server-side validation of training gains (no client-trusted stats)
-- Report tools for exploit macros
-
-Critical for Roblox where auto-clickers are common.
-
-### 22. Mobile-First Combat UX
-
-Large player base on mobile:
-
-- Generous aim assist for skill shots
-- Hold-to-charge vs tap patterns
-- UI scales for technique fusion and codex on small screens
-
-Design combat once with mobile parity, not as a PC afterthought.
+| Fire Affinity | +10% Magic damage, -5% Qi from meditation |
+| Fast Meditation | +25% Qi from meditation, -10% Qi from combat |
+| Unstable Core | +15% combat Qi, +10% breakthrough fail chance |
+| Iron Body | +10% max health, -5% move speed |
+| Swift Feet | +10% move speed, -5% max health |
+| Lucky Star | +10% combat Qi, no tradeoff |
+
+Every talent has a tradeoff or niche — no pure "S-tier" rolls. Rolled 3-at-a-time on first join.
 
 ---
 
 ## Player Identity Summary
 
-After long-term play, a player’s identity is the combination of:
+After a session or two, a player's identity is the combination of:
 
-- Cultivation realm & path
-- Elemental affinities & random talents
-- Weapon evolution branch
-- Technique fusions discovered
-- Faction reputation & ascension choice
-- Mastery profile (what they practiced most)
-- Legend codex entries
-- Mentor / sect affiliations
+- Cultivation realm (overall power tier)
+- Body/Spirit balance (Strength vs. Qi investment)
+- Talents rolled
+- Weapon evolution stage
+- Stages cleared / current stage
+- Mastery profile (which techniques they practiced most)
 
-**Target:** Two 100-hour players can meet and immediately see they took different journeys.
-
----
-
-## Differentiation vs. Typical Roblox Training Games
-
-| Typical training game | Acend |
-|----------------------|-------|
-| Level 1 → 1000 | Mortal → Celestial with breakthrough events |
-| +10% damage nodes | Path mechanics that change combat |
-| Static boss in a box | Migrating, adaptive world bosses |
-| New sword every hour | One weapon that evolves with you |
-| Same build for everyone | Talents, paths, fusions, ascensions |
-| Lobby with train button | Living world with server memory |
-| Solo grind | Mentors, sects, world events |
+**Target:** Two players who've played a few hours can compare "how far did you get" and "are you a body or spirit cultivator" and immediately have something to talk about.
 
 ---
 
 ## Suggested Development Phases
 
-Build vertically — one polished slice before full scope.
+Build vertically — one polished slice before expanding.
 
-### Phase 0 — Foundation (Current)
+### Phase 0 — Foundation (Complete)
 
 - [x] Rojo project structure
 - [x] ProfileStore player data
 - [x] Service / controller bootstrap
-- [ ] Expand `ProfileData` schema for cultivation fields
+- [x] `ProfileData` schema for cultivation fields
 
-### Phase 1 — Vertical Slice (MVP)
+### Phase 1 — Vertical Slice (MVP) — In Progress
 
-**Goal:** One complete loop that feels like Acend, not a generic sim.
+**Goal:** Train, cultivate, breakthrough, evolve a weapon, and clear a handful of stages against both enemy types, in one session.
 
-- 2 realms: Mortal → Body Tempering
-- 2 paths: Sword + Body (one technique each, mastery tracking)
-- 1 zone boss + 1 simple breakthrough event
+- 1 realm ladder: Mortal → Body Tempering → Spirit Gathering (enough to unlock both damage types)
+- Dual stat growth: Qi (cultivation) + Strength (training)
+- Physical vs. Magic damage split; Beast vs. Demon enemy types
+- 3–5 sequential stages, each with a stage boss
 - Weapon evolution: Rusty Sword → Spirit Sword
-- Basic HUD (realm, Qi, technique, coins/materials)
 - Talent roll on first join (3 talents)
+- Basic HUD (realm, Qi, Strength, current stage, weapon)
 
-**Success metric:** A new player can train, breakthrough, evolve a weapon, and beat a boss in one session — and tell a friend what path they chose.
+See [phase-1.md](./game-phase/phase-1.md) for the detailed milestone breakdown.
 
-### Phase 2 — Identity & Depth
+### Phase 2 — More Stages, More Depth
 
-- Full 4 paths (add Elements + Summoning)
-- Technique fusion (5–10 recipes)
-- Faction reputation (2 factions)
-- Random world micro-events (caravan, meteorite)
+- More stages (10+), harder Mixed-type stages requiring both damage types
+- Technique variety per damage type (2–3 Physical, 2–3 Magic techniques)
+- Light technique fusion (a handful of recipes)
+- Weapon evolution branches
 
-### Phase 3 — Social & World
+### Phase 3 — Revisit Scope (Decide Later)
 
-- World boss with migration
-- Boss learning (basic adaptation)
-- World evolution flags (server memory)
-- Mentor system
+Only after Phase 1 and 2 prove the core loop is fun: decide whether to grow toward the original living-world vision (see below) or stay focused on deeper stage content. Don't commit engineering effort to world systems until the core loop is validated.
 
-### Phase 4 — Endgame & Live Ops
+---
 
-- Ascension branches (God / Demon / Dragon / Machine)
-- Reincarnation
-- Sects
-- Seasonal tribulations & saga events
+## Future Ideas (Backlog)
+
+Everything below was part of the original, larger vision. **Not cut — deliberately deferred.** None of it blocks Phase 1 or 2, and none of it should be built until the core stage-clear loop is proven fun. Revisit if/when Phase 3 planning starts.
+
+<details>
+<summary>Dynamic, adaptive world bosses</summary>
+
+Server-wide boss events that migrate between regions, adapt to dominant player strategies (see original "Boss Learning"), and change the world state (weather, terrain damage, minion waves).
+</details>
+
+<details>
+<summary>Living World & World Evolution</summary>
+
+Rotating world events (caravans, meteorites, ruins), a world that "remembers" server milestones (corrupted forests, unlocked ruins), soft/hard persistence model.
+</details>
+
+<details>
+<summary>Reputation & Factions</summary>
+
+Holy Sect / Demon Cult / Mercenary Guild etc., reputation states (Hero/Villain/Exile), faction wars with territory control.
+</details>
+
+<details>
+<summary>Ascension Branches</summary>
+
+God / Demon / Dragon / Machine — major identity choices at endgame with unique kits, unlocked story, visual transformation.
+</details>
+
+<details>
+<summary>Technique Fusion (Full)</summary>
+
+Combine techniques into new ones (Fireball + Wind Slash → Flaming Tornado), recipe-based and lab-based discovery, fusion slots gated by realm.
+</details>
+
+<details>
+<summary>Mentor System</summary>
+
+High-realm players guide newcomers for shared bonuses, cosmetics, and prestige; anti-boosting safeguards.
+</details>
+
+<details>
+<summary>Sects (Player-Run Organizations)</summary>
+
+Guild system with shared halls, contribution shops, sect vs. sect territory, sect-wide breakthrough rituals.
+</details>
+
+<details>
+<summary>Reincarnation</summary>
+
+Endgame prestige loop: reset realm, keep partial talents/cosmetics, gain permanent "Dao fragment" bonuses.
+</details>
+
+<details>
+<summary>Duel Philosophy (Structured PvP)</summary>
+
+Opt-in ranked duels with realm suppression and technique bans; cosmetic-only spectator betting.
+</details>
+
+<details>
+<summary>Legend Codex, Spirit Root Quality, Alchemy & Crafting, Anti-Grind guardrails, Mobile-first combat UX</summary>
+
+Supporting systems from the original design — all still good ideas, all deferred until the core loop is proven.
+</details>
 
 ---
 
 ## Technical Notes (Roblox / Acend Codebase)
 
-Align systems with the existing architecture:
+Align systems with the existing architecture — unchanged from before:
 
-| System | Suggested location |
-|--------|-------------------|
+| System | Location |
+|--------|----------|
 | Player profile schema | `src/shared/Types.luau` + `PlayerDataService` |
-| Balancing tables | `src/shared/Config/` (realms, talents, fusion recipes) |
-| Server logic | `src/server/Services/` (CultivationService, BossService, WorldEventService) |
+| Balancing tables | `src/shared/Config/` (realms, talents, techniques, stages, enemies) |
+| Server logic | `src/server/Services/` (CultivationService, CombatService, StageService) |
 | Client UI & combat | `src/client/Controllers/` |
 | Networking | `src/shared/Net/Remotes.luau` |
-| World state | Server DataStore or ProfileStore `ServerProfile` keyed by place/job |
 
 ### Key Data to Persist (Player)
 
-- Realm, path, talents, spirit root
-- Technique mastery counts & unlocked fusions
-- Weapon evolution stage & battle count
-- Faction reputation map
-- Ascension branch (if chosen)
-- Legend codex entries (compressed IDs + timestamps)
-
-### Key Data to Persist (Server)
-
-- World evolution phase
-- Active / last world boss state
-- Faction territory outcomes
-- Weekly event flags
+- Realm, Qi, Strength, talents
+- Technique mastery counts
+- Weapon evolution stage
+- Highest stage cleared
+- Coins / materials
 
 ---
 
 ## Open Design Questions
 
-Decide these before Phase 1 implementation:
+Decide these during Phase 1 implementation:
 
-1. **Breakthrough failure rate** — How punishing should early realms be?
-2. **Pay model** — Cosmetics only vs. convenience (avoid pay-to-realm)
-3. **Server size** — 20-player cozy vs. 50+ for world bosses
-4. **PvP default** — Opt-in duels only, or faction open conflict zones?
-5. **Reincarnation timing** — Available at Immortal, or earlier soft prestige?
+1. **Breakthrough requirement** — hard threshold in *both* Qi and Strength, or a combined "Power" score? (Current lean: both, to reinforce the dual-stat identity.)
+2. **How many stages for the Phase 1 slice?** (Current lean: 3–5, enough to show Beast/Demon/Mixed variety.)
+3. **Do Beasts/Demons ever mix within one stage**, or only at "Mixed" stages? (Current lean: pure stages first, Mixed stages later as the harder variant.)
+4. **Pay model** — cosmetics only vs. convenience (avoid pay-to-clear-stages).
+5. **Server size** — small (solo/co-op stage clearing) vs. larger shared-world server. Given the stage-clear focus, small/solo-friendly is the current lean.
 
 ---
 
 ## One-Line Pitch
 
-**Acend:** Forge your own cultivation legend in a living world — where your path, talents, weapon, and choices matter as much as your power.
+**Acend:** Train your body, cultivate your spirit, and clear your way up — because no single power gets you through everything.
 
 ---
 
-*Document version: 1.0 — July 2026*
+*Document version: 2.0 — July 2026 (revised: cultivation stage-clearer scope, Physical/Magic duality, deferred living-world systems)*

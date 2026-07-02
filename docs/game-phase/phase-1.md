@@ -1,279 +1,287 @@
 # Phase 1 — Vertical Slice (MVP)
 
-**Status:** In progress  
-**Parent doc:** [GAME_DESIGN.md](../GAME_DESIGN.md)  
+**Status:** In progress
+**Parent doc:** [GAME_DESIGN.md](../GAME_DESIGN.md)
 **Started:** July 2026
+**Revised:** July 2026 — rescoped around the cultivation stage-clearer pivot (Physical/Magic duality, Stage system replacing the single zone boss). Milestones A–C below are implementation-compatible with the revision; only D–F changed shape.
 
 ---
 
 ## Purpose
 
-Phase 1 is our **first real development**. The goal is not to build the full game — it is to ship **one complete cultivation loop** that feels like Acend, not a generic Roblox training sim.
+Phase 1 is our **first real development**. The goal is not to build the full game — it is to ship **one complete loop**: cultivate your spirit, train your body, breakthrough, and clear a handful of stages that actually require both.
 
 When Phase 1 is done, a new player should be able to:
 
 1. Join the game and receive random talents
-2. Choose a cultivation path (Sword or Body)
-3. Cultivate Qi through combat or meditation
+2. Choose a cultivation path (Sword or Body — both Physical-flavored; Magic is available to everyone once unlocked)
+3. Grow **two separate stats**: Qi (via meditation) and Strength (via training)
 4. Attempt a breakthrough from **Mortal** → **Body Tempering**
 5. Evolve their weapon from **Rusty Sword** → **Spirit Sword**
-6. Defeat a zone boss
-7. Tell a friend which path they chose and what happened during their breakthrough
+6. Clear a Beast stage (Physical only), a Demon stage (Magic only), and feel *why* both stats matter
+7. Tell a friend which path they chose and whether they got walled by an enemy type their build couldn't touch
 
-> **Success metric:** One session, one story, one identity — not just a bigger number.
+> **Success metric:** One session, one story — including "I got wrecked by Demons until I trained my Qi."
 
 ---
 
 ## Core Mechanic (Phase 1 Scope)
 
-Everything in this phase supports the core loop:
-
 ```
-Cultivate Qi  →  Breakthrough trial  →  Unlock Body Tempering
-      ↑                                        │
-      └──── fight, meditate, use techniques ───┘
+Cultivate (Qi)  +  Train (Strength)  →  Breakthrough  →  Clear Stages
+      ↑                                                        │
+      └──────────── fight, meditate, use techniques ───────────┘
 ```
 
-Phase 1 does **not** include factions, world bosses, fusion, ascension branches, sects, or server world evolution. Those come in later phases.
+Phase 1 does **not** include: Elements/Summoning paths, technique fusion, factions, world bosses, living-world events, sects, ascension branches, mentor system, or Mixed-type stages (pure Beast/Demon stages only for now). Those are deferred — see [Future Ideas](../GAME_DESIGN.md#future-ideas-backlog) in the GDD.
 
 ---
 
 ## What We Are Building
 
-### 1. Cultivation System
+### 1. Cultivation System (Milestone B — built)
 
 | Feature | Description |
 |---------|-------------|
-| Qi | Primary progression resource; fills toward next breakthrough |
+| Qi | Spirit-power resource; fills toward breakthrough; grown via meditation |
 | Realms | **Mortal** and **Body Tempering** only |
-| Cultivation modes | **Combat** (hit enemies / use technique) and **Meditation** (stand in zone, slower but safe) |
-| Breakthrough | Triggered at 100% Qi; simple trial before realm advances |
-| Failure | Soft penalty only (lose some Qi, short cooldown) — keep early game forgiving |
+| Breakthrough | Triggered at 100% Qi; timed trial; soft failure (Qi loss + cooldown) |
 
-### 2. Cultivation Paths (2 of 4)
+### 2. Training System (Milestone D — new)
 
-| Path | Phase 1 technique | Playstyle |
-|------|-------------------|-----------|
-| **Sword** | Quick Slash | Fast strikes, mobility |
-| **Body** | Iron Palm | Slower, higher damage, more survivability |
+| Feature | Description |
+|---------|-------------|
+| Strength | Body-power resource; grown via active combat drills (using a Physical technique on a target) |
+| No meditation equivalent | Strength cannot be gained passively — it requires actually fighting, mirroring Qi's safe/passive meditation |
 
-- Player picks path after tutorial or on first spawn
-- One technique per path in Phase 1
-- Technique use grants Qi + mastery XP
+### 3. Cultivation Paths (2 of 4) — built, reused as-is
 
-### 3. Mastery (Minimal)
+| Path | Phase 1 technique | Damage Type |
+|------|-------------------|-------------|
+| **Sword** | Quick Slash | Physical |
+| **Body** | Iron Palm | Physical |
 
-- Track use count per technique
-- One mastery milestone in Phase 1 (e.g. Quick Slash → **Heavy Slash** at 500 uses)
-- Mastery shown in HUD; evolution is a feel-good reward, not required to finish Phase 1
+Both Phase 1 paths are Physical-flavored (matches the original design). Everyone additionally gets one baseline **Magic** technique once Spirit Gathering-adjacent Qi thresholds are reached — see Milestone D for the exact unlock rule to design.
 
-### 4. Talents (On First Join)
+### 4. Combat: Physical vs. Magic (Milestone D — new, core to the pivot)
 
-- Roll **3 random talents** from a small pool (5–8 talents)
-- Each talent has a clear bonus and optional tradeoff
-- Stored in player profile; shown on a simple talents panel
-- Examples: Fire Affinity, Fast Meditation, Unstable Core
+| Damage Type | Source Stat | Hits | No Effect On |
+|-------------|-------------|------|---------------|
+| Physical | Strength | Beasts | Demons |
+| Magic | Qi | Demons | Beasts |
 
-### 5. Weapon Evolution
+This is a hard gate (0 damage, not reduced damage) — see GDD §2 for rationale. `CombatService` must check `(technique.DamageType, enemy.Type)` before applying damage, server-side, every hit.
+
+### 5. Mastery (Minimal) — built, reused
+
+- Track use count per technique; Quick Slash → Heavy Slash at 500 uses.
+
+### 6. Talents (On First Join) — built, reused
+
+- 3 random talents from the existing pool; unchanged.
+
+### 7. Weapon Evolution — built config, needs stage-clear hook
 
 | Stage | How to unlock |
 |-------|----------------|
 | Rusty Sword | Default on join |
-| Spirit Sword | Body Tempering realm + 50 combat wins (or boss kill) |
+| Spirit Sword | Body Tempering realm + clearing Stage 3 (was: "50 combat wins" — replaced with stage-clear count to tie into the new structure) |
 
-- One weapon slot; no inventory swapping in Phase 1
-- Visual change on evolution (color, trail, or mesh swap if asset ready)
+### 8. Stage System (Milestone E — new, replaces "Zone Boss")
 
-### 6. Zone Boss
+- **3–5 sequential stages**, each a self-contained arena:
+  - Stage 1 — Beast (Physical only)
+  - Stage 2 — Demon (Magic only)
+  - Stage 3 — Beast, harder
+  - Stage 4 — Demon, harder
+  - Stage 5 — Boss stage (may require both damage types across phases — simplest version: two phases, one per damage type)
+- Clearing a stage's waves spawns that stage's boss; beating it unlocks the next stage and grants rewards.
+- Static spawns/AI is fine for Phase 1 — dynamic/adaptive bosses are a Future Idea, not Phase 1.
 
-- **One** scripted boss in a dedicated arena or zone
-- Designed for 1–3 players
-- Drops breakthrough material (optional bonus) and counts toward weapon evolution
-- Static AI is fine for Phase 1 — dynamic migration comes in Phase 3
-
-### 7. Basic HUD
+### 9. Basic HUD (Milestone F)
 
 | UI element | Shows |
 |------------|--------|
 | Realm & path | e.g. `Mortal — Path of the Sword` |
 | Qi bar | Current / required for breakthrough |
-| Technique | Equipped technique + mastery progress |
+| Strength bar | Current training progress |
+| Stage | Current stage number, cleared/total |
+| Technique | Equipped technique(s) + damage type icon + mastery progress |
 | Talents | Compact list or icon row |
 | Weapon | Name + evolution stage |
-| Materials | Coins / spirit stones (if used in Phase 1) |
 
-Replace `ExampleController` print-only coin feedback with real UI.
+Replace the debug print-based `CultivationController`/`PathSelectController` output with real UI.
 
-### 8. World (Minimal)
+### 10. World (Minimal)
 
-- Training / meditation zone (safe area)
-- Combat zone with basic enemies (respawning mobs)
-- Boss arena
-- Spawn hub connecting zones
-
-Default baseplate is acceptable; zones can be marked with parts + labels until art passes.
+- Meditation zone (safe, passive Qi gain)
+- Training zone (Strength gain via drills)
+- One arena per stage
+- Default baseplate + labeled parts is acceptable; art passes come later.
 
 ---
 
 ## Out of Scope (Phase 1)
 
-Do not build these yet — they belong to later phases:
-
-- Spirit Gathering realm and above
-- Element and Summoning paths
+- Mixed-type stages beyond a simple two-phase final boss
+- Elements and Summoning paths
 - Technique fusion
-- Faction reputation
-- World events (caravans, meteorites)
-- Dynamic / migrating bosses
-- Boss learning AI
-- Mentor system
-- Ascension branches (God / Demon / Dragon / Machine)
-- Reincarnation
-- Sects
-- Legend Codex (full version)
+- Faction reputation, world events, migrating/adaptive bosses
+- Mentor system, sects, ascension branches, reincarnation
 - PvP
 
 ---
 
 ## Technical Plan
 
-Aligned with the existing Acend codebase (Rojo, Wally, ProfileStore, service/controller pattern).
-
 ### New / Updated Files
 
 ```
 src/
 ├── shared/
-│   ├── Types.luau                    ← expand ProfileData
+│   ├── Types.luau                    ← add Strength, StagesCleared
 │   ├── Config/
-│   │   ├── GameConfig.luau           ← Qi rates, breakthrough thresholds
-│   │   ├── Realms.luau               ← Mortal, Body Tempering definitions
-│   │   ├── Paths.luau                ← Sword, Body definitions
-│   │   ├── Talents.luau              ← talent pool + effects
-│   │   ├── Techniques.luau           ← technique stats + mastery tiers
-│   │   └── Weapons.luau              ← evolution chain
+│   │   ├── GameConfig.luau           ← (built) add training rate, damage formulas
+│   │   ├── Realms.luau               ← (built)
+│   │   ├── Paths.luau                ← (built)
+│   │   ├── Talents.luau              ← (built)
+│   │   ├── Techniques.luau           ← (built) add DamageType field
+│   │   ├── Weapons.luau              ← (built) rework unlock condition to stage-based
+│   │   ├── Enemies.luau              ← NEW: Beast/Demon type definitions + resistances
+│   │   └── Stages.luau               ← NEW: stage definitions (enemy waves, boss, rewards)
 │   └── Net/
-│       └── Remotes.luau              ← cultivation, breakthrough, path pick, HUD sync
+│       └── Remotes.luau              ← (built) add StageUpdated, EnterStage, StageCleared
 ├── server/
 │   └── Services/
-│       ├── PlayerDataService.luau    ← new profile fields, reconcile
-│       ├── CultivationService.luau   ← Qi gain, breakthrough logic
-│       ├── CombatService.luau        ← damage, technique validation (server-authoritative)
-│       ├── TalentService.luau        ← roll on first join
-│       └── BossService.luau          ← zone boss spawn + rewards
+│       ├── PlayerDataService.luau    ← (built) add Strength/StagesCleared to template
+│       ├── CultivationService.luau   ← (built) add Strength check to breakthrough gate
+│       ├── TalentService.luau        ← (built)
+│       ├── CombatService.luau        ← NEW: technique validation, damage-type resistance check, Strength gain
+│       └── StageService.luau         ← NEW: stage progression, wave spawning, boss, rewards
 └── client/
     └── Controllers/
-        ├── CultivationController.luau  ← meditation, breakthrough UI flow
-        ├── CombatController.luau       ← technique input, VFX placeholders
-        ├── HudController.luau          ← realm, Qi, talents, weapon
-        └── PathSelectController.luau     ← first-time path choice
+        ├── CultivationController.luau     ← (built, debug) replace with real HUD in Milestone F
+        ├── PathSelectController.luau      ← (built, debug)
+        ├── MeditationVisualsController.luau ← (built)
+        ├── CombatController.luau          ← NEW: technique input, hit VFX placeholders
+        ├── StageController.luau           ← NEW: stage/wave UI feedback
+        └── HudController.luau             ← NEW (Milestone F)
 ```
 
 ### ProfileData (Phase 1 Fields)
 
 ```luau
 export type ProfileData = {
-    -- existing
+    -- existing (built)
     Coins: number,
-
-    -- cultivation
-    Realm: string,              -- "Mortal" | "BodyTempering"
+    Realm: string,
     Qi: number,
-    Path: string?,              -- nil until chosen: "Sword" | "Body"
-    Talents: { string },        -- 3 talent ids
-
-    -- techniques
+    Path: string?,
+    Talents: { string },
     EquippedTechnique: string?,
-    TechniqueMastery: { [string]: number },  -- techniqueId -> use count
-
-    -- weapon
-    WeaponStage: string,        -- "RustySword" | "SpiritSword"
+    TechniqueMastery: { [string]: number },
+    WeaponStage: string,
     CombatWins: number,
-
-    -- breakthrough
-    BreakthroughCooldownUntil: number?,  -- os.time() when ready again
+    BreakthroughCooldownUntil: number?,
     HasCompletedTutorial: boolean,
+
+    -- new for the pivot
+    Strength: number,           -- body power, grown via training
+    StagesCleared: number,      -- highest stage cleared
 }
 ```
 
 ### Remotes (Phase 1)
 
-| Remote | Direction | Purpose |
-|--------|-----------|---------|
-| `CultivationUpdated` | Server → Client | Qi, realm, path sync |
-| `RequestMeditate` | Client → Server | Start/stop meditation |
-| `RequestBreakthrough` | Client → Server | Begin breakthrough trial |
-| `BreakthroughResult` | Server → Client | Success / fail + rewards |
-| `SelectPath` | Client → Server | First-time path choice |
-| `UseTechnique` | Client → Server | Combat technique (validated) |
-| `TalentRolled` | Server → Client | Initial talent display |
-| `WeaponEvolved` | Server → Client | Weapon stage change |
+| Remote | Direction | Purpose | Status |
+|--------|-----------|---------|--------|
+| `CultivationUpdated` | Server → Client | Qi, realm, path sync | Built |
+| `RequestMeditate` | Client → Server | Start/stop meditation | Built |
+| `RequestBreakthrough` | Client → Server | Begin breakthrough trial | Built |
+| `BreakthroughResult` | Server → Client | Success / fail + rewards | Built |
+| `SelectPath` | Client → Server | First-time path choice | Built |
+| `TalentRolled` | Server → Client | Initial talent display | Built |
+| `WeaponEvolved` | Server → Client | Weapon stage change | Declared, not wired |
+| `UseTechnique` | Client → Server | Combat technique (validated) | Declared, not wired |
+| `EnterStage` | Client → Server | Request to enter a stage | New |
+| `StageUpdated` | Server → Client | Wave/boss progress sync | New |
+| `StageCleared` | Server → Client | Stage cleared + rewards | New |
 
-### Architecture Rules
+### Architecture Rules (unchanged)
 
-- **Server authoritative** — Qi, damage, breakthrough outcomes, mastery counts never trusted from client
-- **Config-driven** — balance numbers in `shared/Config/`, not hardcoded in services
-- **Subscribe on load** — services listen to `PlayerDataService.ProfileLoaded` before acting on a player
-- **One service per domain** — cultivation, combat, boss stay separate; avoid a god script
+- **Server authoritative** — Qi, Strength, damage, breakthrough outcomes, stage clears never trusted from client.
+- **Config-driven** — balance numbers in `shared/Config/`, including per-technique `DamageType` and per-enemy `Type`.
+- **Subscribe on load** — services listen to `PlayerDataService.ProfileLoaded`.
+- **One service per domain** — cultivation, combat, stages stay separate.
 
 ---
 
 ## Development Milestones
 
-### Milestone A — Data & Config
-- [ ] Expand `ProfileData` in `Types.luau`
-- [ ] Update `PlayerDataService` template + reconcile
-- [ ] Add config modules: Realms, Paths, Talents, Techniques, Weapons
-- [ ] Add Phase 1 remotes to `Remotes.luau`
-- [ ] Remove or repurpose placeholder `Coins`-only flow if unused
+### Milestone A — Data & Config — **Done**
+- [x] `ProfileData` in `Types.luau`
+- [x] `PlayerDataService` template + reconcile
+- [x] Config modules: Realms, Paths, Talents, Techniques, Weapons
+- [x] Phase 1 remotes declared in `Remotes.luau`
+- [ ] Add `Strength`, `StagesCleared` to `ProfileData` + template
+- [ ] Add `Enemies.luau`, `Stages.luau` config modules
+- [ ] Add `DamageType` field to each technique in `Techniques.luau`
 
-### Milestone B — Cultivation Loop
-- [ ] `CultivationService`: Qi gain from meditation
-- [ ] `CultivationService`: breakthrough request + simple trial (survive timer or kill 1 weak enemy)
-- [ ] Realm advance Mortal → Body Tempering on success
-- [ ] Soft failure state (Qi loss + cooldown)
-- [ ] `CultivationController` + server sync
+### Milestone B — Cultivation Loop — **Done**
+- [x] `CultivationService`: Qi gain from meditation
+- [x] `CultivationService`: breakthrough request + 20s trial + 85% base success roll
+- [x] Realm advance Mortal → Body Tempering on success
+- [x] Soft failure state (Qi loss + cooldown)
+- [x] Qi capped at realm's `QiRequired`
+- [x] Talent modifiers applied (`MeditationQiRate`, `BreakthroughFailChance`)
+- [ ] Breakthrough gate also requires a Strength threshold (once Milestone D lands)
 
-### Milestone C — Path & Talents
-- [ ] `TalentService`: roll 3 talents on first join
-- [ ] Path select UI on first spawn (Sword vs Body)
-- [ ] Grant starting technique based on path
-- [ ] Talent modifiers applied to Qi rate / damage (at least 2 talents functional)
+### Milestone C — Path & Talents — **Done**
+- [x] `TalentService`: roll 3 talents on first join (own check, not Reconcile)
+- [x] `SelectPath` handling: grants starting Physical technique
+- [x] Debug controls: `PathSelectController`
 
-### Milestone D — Combat & Mastery
-- [ ] Basic enemies in combat zone (server-spawned, simple chase + melee)
-- [ ] `CombatService` + `CombatController`: one technique per path
-- [ ] Qi + mastery increment on valid hits
-- [ ] One mastery evolution threshold (optional polish)
+### Milestone D — Training & Combat — **Not started (rescoped from "Combat & Mastery")**
+- [ ] Training zone: Strength gain from active technique use on a target dummy/enemy
+- [ ] `CombatService`: technique validation, server-authoritative damage
+- [ ] Damage-type resistance check: Physical techniques do 0 damage to Demons, Magic techniques do 0 damage to Beasts
+- [ ] Baseline Magic technique granted to all players once a Qi/realm threshold is met
+- [ ] Qi + mastery increment on valid hits (existing mastery system extends naturally)
+- [ ] `CombatController`: technique input, hit VFX placeholders
 
-### Milestone E — Weapon & Boss
-- [ ] Track `CombatWins` on enemy / boss kills
-- [ ] Weapon evolution Rusty Sword → Spirit Sword
-- [ ] One zone boss with HP bar (client) and loot / win credit (server)
-- [ ] Boss reachable after or during Body Tempering
+### Milestone E — Stages & Weapon — **Not started (rescoped from "Weapon & Boss")**
+- [ ] `Stages.luau`: define Stage 1 (Beast) through Stage 5 (boss, two-phase)
+- [ ] `Enemies.luau`: Beast/Demon type definitions + resistances
+- [ ] `StageService`: wave spawning, stage-clear detection, boss spawn, rewards
+- [ ] Weapon evolution Rusty Sword → Spirit Sword on Body Tempering + Stage 3 clear
+- [ ] `StageController`: stage/wave UI feedback (client)
 
-### Milestone F — HUD & Polish
-- [ ] `HudController`: realm, Qi bar, path, technique, talents, weapon
-- [ ] Breakthrough moment feedback (screen flash, sound placeholder, chat message)
-- [ ] Zone labels or map markers for train / fight / boss areas
+### Milestone F — HUD & Polish — **Not started**
+- [ ] `HudController`: realm, Qi bar, Strength bar, current stage, path, technique(s), talents, weapon
+- [ ] Damage-type indicator on technique icons (so "this won't work on Demons" is legible before you swing)
+- [ ] Breakthrough / stage-clear feedback (screen flash, sound placeholder, chat message)
+- [ ] Replace debug print output in `CultivationController`/`PathSelectController` with real UI
 - [ ] Playtest full loop start to finish
 
 ---
 
 ## Balancing Targets (Starting Values)
 
-Tune in `GameConfig.luau` — these are first guesses:
+Tune in `GameConfig.luau` — first guesses; existing Qi/breakthrough values already implemented, Strength/combat values are new:
 
-| Setting | Value |
-|---------|-------|
-| Qi required (Mortal → Body Tempering) | 100 |
-| Qi per meditation tick | 1 every 2s |
-| Qi per technique hit | 3–5 |
-| Breakthrough trial | Survive 20s in a small arena OR defeat inner demon (1 weak mob) |
-| Breakthrough fail Qi loss | 25% of current Qi |
-| Breakthrough cooldown | 30 seconds |
-| Mastery tier 1 | 500 technique uses |
-| Spirit Sword requirement | Body Tempering + 50 combat wins |
+| Setting | Value | Status |
+|---------|-------|--------|
+| Qi required (Mortal → Body Tempering) | 100 | Built |
+| Qi per meditation tick | 1 every 2s | Built |
+| Breakthrough trial duration | 20s | Built |
+| Breakthrough base success chance | 85% | Built |
+| Breakthrough fail Qi loss | 25% of current Qi | Built |
+| Breakthrough cooldown | 30 seconds | Built |
+| Mastery tier 1 | 500 technique uses | Built |
+| Strength required (Mortal → Body Tempering) | 100 (mirrors Qi) | New — needs config |
+| Strength per successful training hit | 3–5 | New — needs config |
+| Physical/Magic damage to wrong enemy type | 0 (hard gate) | New — needs config |
+| Spirit Sword requirement | Body Tempering + Stage 3 cleared | Changed from "50 combat wins" |
 
 Adjust after first playtest.
 
@@ -281,18 +289,20 @@ Adjust after first playtest.
 
 ## Acceptance Criteria (Phase 1 Complete)
 
-All of the following must be true:
-
 - [ ] New player joins → talents rolled → path selection shown
-- [ ] Player can fill Qi bar via meditation **or** combat
-- [ ] Player can attempt breakthrough; success advances to Body Tempering
-- [ ] Failed breakthrough applies soft penalty, not a kick or hard reset
-- [ ] Sword and Body paths feel different in combat (speed vs power)
+- [x] Player can fill Qi bar via meditation
+- [ ] Player can fill Strength bar via training (active combat drills)
+- [x] Player can attempt breakthrough; success advances to Body Tempering
+- [x] Failed breakthrough applies soft penalty, not a kick or hard reset
+- [ ] A Physical-only build cannot damage Demons; a Magic-only build cannot damage Beasts (verified in Studio, not just in code)
+- [ ] Sword and Body paths feel different in combat (speed vs power), both Physical
 - [ ] Weapon evolves to Spirit Sword when conditions met
-- [ ] Zone boss can be defeated and counts toward progression
-- [ ] HUD shows realm, Qi, path, technique, talents, weapon
-- [ ] All progression persists across rejoin (ProfileStore)
-- [ ] No client-trusted stat changes for Qi, mastery, or realm
+- [ ] Player can clear at least 3 sequential stages, including one of each enemy type
+- [ ] HUD shows realm, Qi, Strength, path, technique(s), talents, weapon, current stage
+- [x] Cultivation progression persists across rejoin (ProfileStore)
+- [ ] Strength and stage progress also persist across rejoin
+- [x] No client-trusted stat changes for Qi, mastery, or realm
+- [ ] No client-trusted stat changes for Strength or stage clears
 
 ---
 
@@ -300,60 +310,53 @@ All of the following must be true:
 
 **Phase 0 (complete):**
 
-- [x] Rojo project structure
-- [x] ProfileStore via `PlayerDataService`
-- [x] Service / controller auto-bootstrap
-- [x] Central remotes registry
-- [x] Example client listening for `CoinsUpdated`
+- [x] Rojo project structure, ProfileStore, service/controller bootstrap, central remotes registry
 
-**Phase 1 (not started in code):**
+**Phase 1 (in progress):**
 
-- [ ] Profile schema expansion
-- [ ] Cultivation system
-- [ ] All milestones A–F above
+- [x] Milestone A — Data & Config (needs Strength/Stages additions)
+- [x] Milestone B — Cultivation Loop
+- [x] Milestone C — Path & Talents
+- [x] Meditation visual feedback (Qi aura particle effect + frozen idle while meditating) — confirmed working live in Studio; a real body-pose animation is deferred (current Roblox R15 rigs are fully constraint-based, so classic Motor6D joint-posing doesn't work on any character — a real `Animation` asset is required and wasn't in scope yet)
+- [ ] Milestone D — Training & Combat
+- [ ] Milestone E — Stages & Weapon
+- [ ] Milestone F — HUD & Polish
 
 ---
 
-## Open Decisions (Resolve During Phase 1)
+## Open Decisions (Resolve During Milestone D/E)
 
-| Question | Recommendation for Phase 1 |
-|----------|---------------------------|
-| Breakthrough failure rate | Forgiving — ~80–90% success for first realm |
-| Meditation vs combat balance | Combat 2–3× faster; meditation safer for AFK-light players |
-| Coins in Phase 1 | Keep as secondary currency for a future shop; not core loop |
-| Boss difficulty | Beatable solo at Body Tempering with learned technique |
-| Art scope | Placeholder parts + UI first; swap assets later |
+| Question | Recommendation |
+|----------|-----------------|
+| Breakthrough failure rate | Keep forgiving — 85% success, already tuned |
+| Strength gain balance vs. Qi | Mirror meditation's numbers 1:1 to start (3-5 per hit vs 1 per 2s tick — combat should feel faster, matching original "combat 2-3x faster" intent) |
+| How is the baseline Magic technique granted? | Simplest: available to everyone once Qi ≥ 50% of Mortal's requirement, no separate unlock quest |
+| Coins in Phase 1 | Still secondary; not core loop |
+| Stage difficulty curve | Beatable solo; Stage 5 boss may need a partner if playtesting shows it's too hard alone |
 
 ---
 
 ## Playtest Script
 
-Use this checklist when testing Phase 1:
-
 1. Join as a new player (or wipe test data)
-2. Note the 3 rolled talents
-3. Pick Sword or Body
-4. Meditate until ~30% Qi — confirm HUD updates
-5. Fight enemies with your technique — confirm Qi and mastery rise
-6. Attempt breakthrough before 100% Qi — should fail gracefully
-7. Reach 100% Qi — attempt breakthrough — pass trial
-8. Confirm Body Tempering realm and any unlocks
-9. Grind combat wins / beat boss — confirm Spirit Sword evolution
-10. Leave and rejoin — confirm all data saved
+2. Note the 3 rolled talents, pick Sword or Body
+3. Meditate until ~30% Qi — confirm HUD updates
+4. Train (fight a dummy) until Strength rises — confirm HUD updates
+5. Attempt breakthrough before 100% Qi/Strength — should fail gracefully
+6. Reach both thresholds — attempt breakthrough — pass trial
+7. Enter Stage 1 (Beast) — confirm Physical technique works, Magic technique (if equipped) does nothing
+8. Enter Stage 2 (Demon) — confirm the reverse
+9. Clear Stage 3 — confirm Spirit Sword evolution
+10. Leave and rejoin — confirm all data (including Strength, stage progress) saved
 
 ---
 
 ## After Phase 1
 
-When this phase is complete, move to **Phase 2** (Identity & Depth):
+When this phase is complete, move to **Phase 2** (More Stages, More Depth) — see [GAME_DESIGN.md](../GAME_DESIGN.md#phase-2--more-stages-more-depth).
 
-- Add Element and Summoning paths
-- Technique fusion (5–10 recipes)
-- Two factions with reputation
-- Random world micro-events
-
-Do not start Phase 2 until the Phase 1 playtest script passes and the core loop feels fun.
+Do not start Phase 2 until the Phase 1 playtest script passes and the Physical/Magic gate actually feels like a real decision, not busywork.
 
 ---
 
-*Phase 1 document version: 1.0 — July 2026*
+*Phase 1 document version: 2.0 — July 2026 (revised for the cultivation stage-clearer pivot)*
